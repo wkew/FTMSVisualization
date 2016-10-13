@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<title>{{ title }}</title>
+        {{ bokeh_css }}
+        {{ bokeh_js }}
+    </head>
+	<body class="bk-body">
+        <h1>Interactive Van Krevelen Diagrams - Modern Visualisation of High Resolution Complex Mixture MS Data</h1>
+        <p>
+		This is an example of the proposed way to view MS data... 
+		[citation here]
+		[source code here]
+		
+		This page is best viewed on a high resolution monitor. At a minimum, 1600x1000 is required to fully view all elements at once. Press F11 to full screen your webbrowser.
+        </p>
+        {{ plot_div|indent(8) }}
+        <br />
+        <br />
+        {{ plot_script|indent(8) }}
+    </body>
+</html>
