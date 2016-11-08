@@ -121,31 +121,31 @@ Required File Structure
 Example input files are provided, along with example output files.
 The folder hierarchy should be as follows:
 
-/--- (this is the "scriptlocation" as defined in your script files)
+	/--- (this is the "scriptlocation" as defined in your script files)
 	
-..*	*scripts*
+	*scripts*
 	
-..*	data/--- (this is the data location as defined in your script files)
+	data/--- (this is the data location as defined in your script files)
 	
-	InputPeaklist/---
+		InputPeaklist/---
 	
-	*.txt (if you want to do formula assignment)
+			*.txt (if you want to do formula assignment)
 	
-	OutputCSV/--- (output from your formula assignment tool, or from the petroorg reformatter, or from the provided formula assignment tool)
+		OutputCSV/--- (output from your formula assignment tool, or from the petroorg reformatter, or from the provided formula assignment tool)
 	
-		*-hits.csv
+			*-hits.csv
 	
-		*-isohits.csv
+			*-isohits.csv
 		
-		*-nohits.csv
+			*-nohits.csv
 	
-	OutputHTML/---
+		OutputHTML/---
 	
-		templates/---
+			templates/---
 	
-			index.html (template HTML file, example included)
-	
-		themes.yaml
+				index.html (template HTML file, example included)
+		
+			themes.yaml
 
 
 All other folders and files should be created automatically as you run the scripts. 
