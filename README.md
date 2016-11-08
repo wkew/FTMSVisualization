@@ -101,6 +101,8 @@ This tool will read in the -hits, -isohits, and -nohits files, and produce an in
 The output is based on a template, and therefore you should keep the OutputHTML directory as is, unless you remove the template.
 This whole script relies on the Bokeh Plotting library. This has been tested on version 0.12.3.
 Find more - http://bokeh.pydata.org/en/latest/ 
+
+[Example Output](https://wkew.github.io/FTMSViz/SRFA-plot.html)
 	
 --------------------------	
 FTMSVizProcessingModule.py
