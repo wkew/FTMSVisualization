@@ -79,6 +79,9 @@ The output are publication quality PNG and EPS files.
 The backend is matplotlib, and it is very customisable for your own uses. 
 Without customisation, the images should still be of interest.
 The file will prompt you a few questions - do you want titles? do you want hexbin outputs?. These are self-explanatory.
+Example output:
+![alt text](https://github.com/wkew/FTMSVisualization/blob/master/data/Images/VanK/SRFA%20-%20Van%20Krevelen%20by%20mz.png "Van Krevelen")
+![alt text](https://github.com/wkew/FTMSVisualization/blob/master/data/Images/DBE/SRFA%20-%20DBE%20vs%20Carbon%20Number.png "DBE vs C# Plot")
 	
 -----------------------
 3-HeteroClassPlotter.py
@@ -87,6 +90,8 @@ This script leverages Seaborn plotting library to produce a heteroatomic class d
 Without modification (aside from the location), the script should work. 
 Note that it will build a plot for all the -hits.csv files in the OutputCSV, so for a single sample make sure to have only a single -hits.csv in the output folder, etc.
 Examples of other types of plots are included in a commented out section of code.
+Example output:
+![alt text](https://github.com/wkew/FTMSVisualization/blob/master/data/Images/Classes/Barplot.png "Heteroatomic Class")
 
 -----------------------	
 4-InteractivePlotter.py
