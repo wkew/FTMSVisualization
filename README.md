@@ -123,9 +123,9 @@ The folder hierarchy should be as follows:
 
 /--- (this is the "scriptlocation" as defined in your script files)
 	
-	*scripts*
+..*	*scripts*
 	
-	data/--- (this is the data location as defined in your script files)
+..*	data/--- (this is the data location as defined in your script files)
 	
 	InputPeaklist/---
 	
