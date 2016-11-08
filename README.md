@@ -122,22 +122,31 @@ Example input files are provided, along with example output files.
 The folder hierarchy should be as follows:
 
 /--- (this is the "scriptlocation" as defined in your script files)
+	
 	*scripts*
+	
 	data/--- (this is the data location as defined in your script files)
-		InputPeaklist/---
-			*.txt (if you want to do formula assignment)
-		OutputCSV/--- (output from your formula assignment tool, or from the petroorg reformatter, or from the provided formula assignment tool)
-			*-hits.csv
-			*-isohits.csv
-			*-nohits.csv
-		OutputHTML/---
-			templates/---
-				index.html (template HTML file, example included)
-			themes.yaml
-	MassToFormula/---
-		dictionaries/--
-			neg/--
-			pos/--
+	
+	InputPeaklist/---
+	
+	*.txt (if you want to do formula assignment)
+	
+	OutputCSV/--- (output from your formula assignment tool, or from the petroorg reformatter, or from the provided formula assignment tool)
+	
+		*-hits.csv
+	
+		*-isohits.csv
+		
+		*-nohits.csv
+	
+	OutputHTML/---
+	
+		templates/---
+	
+			index.html (template HTML file, example included)
+	
+		themes.yaml
+
 
 All other folders and files should be created automatically as you run the scripts. 
 
