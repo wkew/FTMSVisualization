@@ -27,6 +27,8 @@ i-van Krevelen
     along with FTMS Visualisation.  If not, see <http://www.gnu.org/licenses/>.
 	
 
+Version 1.0 
+[![DOI](https://zenodo.org/badge/70805234.svg)](https://zenodo.org/badge/latestdoi/70805234)
 
 This set of tools are python scripts for processing and visualising high-resolution FTMS data. 
 
