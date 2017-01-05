@@ -43,7 +43,7 @@ All of the scripts have been tested in Python 3, though should be largely compat
 * matplotlib version: 1.5.3
 * Bokeh version: 0.12.3
 
-The example jupyter notebook - [5-Interactive FTMS and Visualisation.ipynb](#5-interactive-ftms-and-visualisationipynb) - was originally written for Python 2 and may not work for Python 3.
+The example jupyter notebook - [5-Interactive FTMS and Visualisation.ipynb](#5-interactive-ftms-and-visualisationipynb) also now works in Python 3.
 
 For all files, you will need to correct the location of the scripts & the input data. An example of this location is included in the files.
 File locations must be absolute (Python 3).
