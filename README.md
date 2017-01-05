@@ -38,7 +38,7 @@ A demonstration of some of the functionality is available through an [online too
 
 All of the scripts have been tested in Python 3, though should be largely compatible with Python 2. The scripts have been successfully tested with the following package versions:
 * Python version: 3.5.2
-* Pandas version: 0.19.1
+* Pandas version: 0.19.2
 * Numpy version: 1.11.0
 * matplotlib version: 1.5.3
 * Bokeh version: 0.12.3
@@ -115,13 +115,13 @@ Find more - http://bokeh.pydata.org/en/latest/
 
 # 5-Interactive FTMS and Visualisation.ipynb
 
-This is an example Jupyter notebook - Python 2.7 - which demonstrates how the datashader package could be utilised to visualisation of full resolution mass spectral data without the need to install or share proprietary formats
+This is an example Jupyter notebook which demonstrates how the datashader package could be utilised to visualisation of full resolution mass spectral data without the need to install or share proprietary formats
 
 Package Versions this notebook has been tested & works on:
-* Python version: 2.7.12
-* Pandas version: 0.19.2+0.g825876c.dirty
+* Python version: 2.7.12 or 3.5.2
+* Pandas version: 0.19.2
 * Numpy version: 1.11.2
-* xarray version: 0.8.2
+* xarray version: 0.8.2 or 0.7.2
 * Datashader version: 0.4.0
 * Bokeh version: 0.12.3
 
