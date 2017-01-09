@@ -26,8 +26,11 @@
     You should have received a copy of the GNU General Public License
     along with FTMS Visualisation.  If not, see <http://www.gnu.org/licenses/>.
 
+### Reference:
 
-Version 1.0
+Kew, W., Blackburn, J. W. T., Clarke, D. J., and Uhrín, D. (2017) Interactive van Krevelen Diagrams – Advanced Visualization of Mass Spectrometry Data of Complex Mixtures. Rapid Commun. Mass Spectrom., doi: [10.1002/rcm.7823](http://dx.doi.org/10.1002/rcm.7823)
+
+# Version 1.0
 [![DOI](https://zenodo.org/badge/70805234.svg)](https://zenodo.org/badge/latestdoi/70805234)
 
 This set of tools are python scripts for processing and visualising high-resolution FTMS data.
