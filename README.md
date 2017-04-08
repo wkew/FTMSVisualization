@@ -37,7 +37,7 @@ This set of tools are python scripts for processing and visualising high-resolut
 
 The tools are easy to use, but will require the user to make minor changes for their system.
 
-A demonstration of some of the functionality is available through an [online tool](https://wkew.co.uk/FTMSVis/upload.html), allowing the user to test these tools without installing python.
+A demonstration of some of the functionality is available through an [online tool](https://wkew.co.uk/ftmsvisonline), allowing the user to test these tools without installing python.
 
 All of the scripts have been tested in Python 3, though should be largely compatible with Python 2. The scripts have been successfully tested with the following package versions:
 * Python version: 3.5.2
