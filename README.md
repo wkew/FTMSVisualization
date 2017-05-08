@@ -132,6 +132,11 @@ Correct as of 4/1/17: You can install a working set of packages by installing [M
 ```
 conda install bokeh datashader jupyter
 ```
+# 7-FormDataMerge.py
+
+This tool will take multiple input files (-hits.csv) from a directory "MergeInput" and produce output files where the data have been compiled into a single table of n rows (Samples) and m columns (formulae). This is useful for statistical analysis.
+Outputs are produced where NaNs are left blank, or where they are filled with a value equivalent to a random number at the level of the noise.
+Outputs are also produced which are row-sum normalised, or not.
 
 
 # FTMSVizProcessingModule.py
