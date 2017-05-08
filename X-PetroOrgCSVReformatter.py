@@ -49,50 +49,34 @@ import pandas as pd
 try: #test if running in ipython
     __IPYTHON__
 except NameError: #if not running in ipython....
-    import POrgProcessingModule as POPM
+    import FTMSVizProcessingModule as FTPM
     path  = os.getcwd()+"\\data\\" #example data location
 else: #if running in ipython
-    scriptlocation = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts"
+    scriptlocation = "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/Scripts/"
     sys.path.append(scriptlocation)
-    import POrgProcessingModule as POPM
-    path  = scriptlocation + "\\data\\" #This is the location of our example data. C
+    import FTMSVizProcessingModule as FTPM
+    
+    path = "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/"
 
+    petrorgcsvloc = "POrgCSV/"
+    
 #Here we define the input folder location. This directory should contain CSV files output by petroorg. It should not matter if there are other files or directories present, as long as they dont end in .csv
 #This section takes the user input to check the correct directory is being examined. In case it isnt, the user is prompted to define the correct data location.
-print(path)
+print(path+petrorgcsvloc)
 isok = input("Is the path above correct for your data - Y or N? ")
 if isok.upper() != "Y":
     newpath = input("What is the correct location of your data? ")
-    while os.path.isdir(newpath) == False:
-        print("The location does not exist at " +str(newpath))
+    while os.path.isdir(newpath+petrorgcsvloc) == False:
+        print("The location does not exist at " +str(newpath+petrorgcsvloc))
         newpath = input("What is the correct location of your data? ")
     else:
-        path = newpath
+        path = newpath+petrorgcsvloc
         
-isNa, isK = "n", "n"
-ionisationmode = "Negative"#"Positive"
-
-whationisationmode = input("Is this Negative or Positive? ")
-while whationisationmode.upper()!= "NEGATIVE" and whationisationmode.upper()!= "POSITIVE":
-    print("Please type negative or positive.")
-    whationisationmode = input("Is this Negative or Positive? ")
-    ionisationmode = "Negative"#"Positive"
-else:
-    if whationisationmode.upper()!= "NEGATIVE":
-        ionisationmode = "Negative"#"Positive"
-    elif whationisationmode.upper()!= "POSITIVE":
-        ionisationmode = "Positive"
-        isadducts =input("Have you included adducts such as Na, K - Y or N? ")
-        if isadducts.upper() == "Y":
-            isNa = input("Sodium - Y or N? ")
-            isK = input("Potassium - Y or N? ")
-    
-#this are locations used historically
 
 #this function lists the files within the path we defined. It only includes ones ending in ".csv". It then runs the main function for each element in the list.
 def fileconverter():
-    print("Looking for CSVs in " + path)
-    filesA = os.listdir(path)
+    print("Looking for CSVs in " + path+petrorgcsvloc)
+    filesA = os.listdir(path+petrorgcsvloc)
     filesB = []
     for x in filesA:
         if x[-4:] == ".csv":
@@ -108,14 +92,14 @@ def fileconverter():
 
 #This is the main body of the script, a function which parses the files and outputs the new files.
 def porgcsvreader(sample):
-    inputfile = path +"/" +sample+".csv"        #input file names
+    inputfile = path+petrorgcsvloc +"/" +sample+".csv"        #input file names
     data=[]                                     #create an empty list
     with open(inputfile,'r') as csvfile:       #read the input csv line by line
         linereader = csv.reader(csvfile,delimiter=',')
         for row in linereader:
             if row == []:
                 continue                        #if a line is empty, ignore it.
-            if POPM.intchecker(row[0]):         #if a line begins with an integer, use this line. 
+            if FTPM.intchecker(row[0]):         #if a line begins with an integer, use this line. 
                 data.append(row[1:])
     data2=[]                                    #PetroOrg CSVs have an empty column due to a trailing comma on every line. This removes those.
     for x in data:
@@ -123,104 +107,64 @@ def porgcsvreader(sample):
             data2.append(x[:-1])
         else:
             data2.append(x)   
-    #here we define the list of headers we want in our output datafile. This list is exhaustive - we trim it down for the main output file. This is designed to work with CHNOS elemental assignments only. 
-    #CHNOS and in negative mode. 
             
-    newheaders = ["Exp. m/z", "Recal m/z", "Theor. Mass", "Error", "Rel. Abundance", "Signal2Noise", "DBE",
-                  'Clet', 'Cno', 'Hlet', 'Hno', 'Nlet', 'Nno', 'Olet', 'Ono', 'Slet', 'Sno', '13C1let', '13C1no']
-    #here we allow the addition of adducts
-    if isNa.upper() == "Y":
-        if isK.upper() != "Y":
-            temp = newheaders[:-2]
-            temp.extend(["Nalet","Nano",'13C1let', '13C1no'])
-        elif isK.upper() == "Y":
-            temp = newheaders[:-2]
-            temp.extend(["Nalet","Nano","Klet","Kno",'13C1let', '13C1no']) #this assumes that potassium comes after sodium - check!
-        newheaders = temp
-    elif isK.upper() == "Y":
-        temp = newheaders[:-2]
-        temp.extend(["Klet","Kno",'13C1let', '13C1no'])
-        newheaders = temp
-        
-    shortlist = newheaders[:3]+[newheaders[4]]
-    shortlist = shortlist[:2]+[shortlist[3]]+[shortlist[2]] #shortlist is the no hits.
-    shortlistlength = len(shortlist)
-    midlist = newheaders[:-2] #mid list is for monoisotopic assignments, removes the 13C columns
-    midlistlength = len(midlist)
-    isolistlength = len(newheaders) #len(max(data,key=len))-1 #isolist is for the isotopologues - i.e. includes 13C assignments
-    sizeB = len(data)
-    nohits = np.zeros((sizeB,shortlistlength))
-    nohits = pd.DataFrame(nohits,columns=shortlist,dtype=object)
-    hits = np.zeros((sizeB,midlistlength))   
-    hits = pd.DataFrame(hits,columns=midlist,dtype=object)
-    isolist = np.zeros((sizeB,isolistlength))
-    isolist = pd.DataFrame(isolist,columns=newheaders,dtype=object) #now we create three output dataframes with the correct headers
+    #Here we define the headers we need. Elemental headers are added on the fly if necessary, and so we DONT have to limit our elements anymore! 
+    newheaders = ["Exp. m/z", "Recal m/z", "Theor. Mass", "Error", "Rel. Abundance", "Signal2Noise", "DBE"]
+    nohitsheaders = ['Exp. m/z', 'Recal m/z', 'Theor. Mass', 'Rel. Abundance']
+    
+    nohits = pd.DataFrame(np.zeros((len(data2),len(nohitsheaders))),columns=nohitsheaders,dtype=object)
+    hits = pd.DataFrame(np.zeros((len(data2),len(newheaders))),columns=newheaders,dtype=object)
+    isolist = pd.DataFrame(np.zeros((len(data2),len(newheaders))),columns=newheaders,dtype=object) #now we create three output dataframes with the correct headers
     a, b, c = 0, 0, 0 #this is some counting
     for row in data2:
-        i,j,k = 0,0,0
-        if len(row) ==shortlistlength:
-            for x in range(len(row)):
-                position=shortlist[i]
-                nohits[position][a] = row[x]
-                i += 1
+        if "C" not in row: #this will break if you have formula with no carbon. 
+            nohits.loc[a,['Exp. m/z', 'Recal m/z', 'Rel. Abundance','Theor. Mass']] = row
             a+= 1
-        elif len(row) == isolistlength:
-            for x in range(len(row)):
-                position=newheaders[j]
-                isolist[position][b] = row[x]
-                j += 1
+        elif "13C" in row: #this will break if you have non-13C isotopologues, i.e. 18O. PetroOrg doesn't seem to assign those, anyway.
+            isolist.loc[b,["Exp. m/z", "Recal m/z", "Theor. Mass", "Error", "Rel. Abundance", "Signal2Noise", "DBE"]] = row[:7]
+            for x in range(len(row[7:])):
+                if FTPM.intchecker(row[7+x]):
+                    isolist.loc[b,row[7+x-1]] = row[7+x]
             b+= 1
-        elif len(row) == midlistlength:
-            for x in range(len(row)):
-                position=midlist[k]
-                hits[position][c] = row[x]
-                k += 1
+        elif "13C" not in row:
+            hits.loc[c,["Exp. m/z", "Recal m/z", "Theor. Mass", "Error", "Rel. Abundance", "Signal2Noise", "DBE"]] = row[:7]
+            for x in range(len(row[7:])):
+                if FTPM.intchecker(row[7+x]):
+                    hits.loc[c,row[7+x-1]] = row[7+x]
             c+= 1  
-    nohits = POPM.cleanupDF(nohits) #this function cleansup the dataframe (removing empty rows, re-sorting, etc)
-    isolist = POPM.cleanupDF(isolist)
-    hits = POPM.cleanupDF(hits)
+    nohits = FTPM.cleanupDF(nohits) #this function cleansup the dataframe (removing empty rows, re-sorting, etc)
+    isolist = FTPM.cleanupDF(isolist)
+    hits = FTPM.cleanupDF(hits)
     hits = hits.sort_index()
-    
-    #this section generates a single string for the formula.
-    formulae = []
-    elementcolumns = [x for x in list(hits.columns.values) if "no" in x]
-    formulatorinput = hits.as_matrix(columns=elementcolumns)
-    for x in formulatorinput:
-        c = int(x[0])
-        h = int(x[1])
-        n = int(x[2])
-        o = int(x[3])
-        s = int(x[4])
-        if isNa.upper() == "Y":
-            na = int(x[5])
-            if isK.upper() =="Y":
-                k = int(x[6])
-        elif isK.upper() =="Y":
-            k =int(x[5])
-        else:
-            na = False
-            k = False
-        formula = POPM.formulator(c,h,n,o,s,na,k,ionisationmode)
-        formulae.append(formula)
-    formulae2 = pd.DataFrame(formulae,columns=["Formula"])
+   
+    formulaewithadducts, formulae, adducts = FTPM.porgformulator(hits)
+   
     
     #this section generates a single string for the heteroatomic class
     heteroclasA = []
-    for x in formulae:
+    elementclass = []
+    for y in formulae.values:
+        x = str(y)[2:-2]
         split = re.split('([H][\d]+)',x)
-        heteroclasA.append(split[-1])
+        heteroclasstemp = split[-1]
+        if heteroclasstemp == '':
+            heteroclasstemp = "CH"
+        elementclasstemp = ''.join([i for i in heteroclasstemp if not i.isdigit()])
+        elementclass.append(elementclasstemp)
+        heteroclasA.append(heteroclasstemp)
     heteroclasA2 = pd.DataFrame(heteroclasA,columns=["HeteroClass"]) 
+    elementclasses = pd.DataFrame(elementclass,columns=["ElementClass"])
     
     #this bit groups the resulting dataframes into one
-    result = pd.concat([hits,formulae2,heteroclasA2],axis=1)
+    result = pd.concat([hits,formulae,formulaewithadducts,adducts,heteroclasA2,elementclasses],axis=1)
     result = result.sort_values("Exp. m/z")
     result.drop('Signal2Noise',axis=1,inplace=True) #this drops the SNR column as we dont use it because of how we input to PetroOrg.
     
-    POPM.make_sure_path_exists(path +"/OutputCSV/") #this function checks the output directory exists; if it doesnt, it creates it.
+    FTPM.make_sure_path_exists(path +"/OutputCSV/") #this function checks the output directory exists; if it doesnt, it creates it.
     #this then writes the output files 
     nohits.to_csv(path +"/OutputCSV/"+sample+"-nohits.csv")
     result.to_csv(path +"/OutputCSV/"+sample+"-hits.csv")
-    isolist.to_csv(path +"/OutputCSV/"+sample+"-isolist.csv")
+    isolist.to_csv(path +"/OutputCSV/"+sample+"-isohits.csv")
         
 #this line runs the entire script.    
 fileconverter()

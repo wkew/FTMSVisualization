@@ -76,19 +76,13 @@ try: #test if running in ipython
     __IPYTHON__
 except NameError: #if not running in ipython....
     import FTMSVizProcessingModule as FTPM
-    path  = os.getcwd()+"\\MassToFormula\\dictionaries\\" #example data location
+    path  = os.getcwd()+"\\data\\" #example data location
 else: #if running in ipython
-    #homepath
-    scriptlocation = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts"
-    #OfficeDesktopPath
-    #scriptlocation = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\FTMS\\DataProcessingScripts"
+    scriptlocation = "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/Scripts/"
     sys.path.append(scriptlocation)
     import FTMSVizProcessingModule as FTPM
-    #OfficeDesktopPath
-    #path = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\MassToFormula\\dictionaries\\"
-    #HomeDesktopPath
-    path = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\MassToFormula\\dictionaries\\"
-
+    path = "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/"
+    
 from datetime import datetime
 
 #This is our list of masses - i.e. the center point of each output csv file. For ease/speed, we chunk our lists into 100 m/z blocks.
@@ -112,19 +106,20 @@ startTime = datetime.now()
 print("Elemental formulae limits are coded into the script. Please double check they are suitable for your application.")
 
 #This calculates the mass of a given formulae - for an ION
-def getmass(c,h,o,n,s,na,k):
+def getmass(c,h,o,n,s,p,na,k):
     massC = chemdict['C'][0] * c
     massH = chemdict['H'][0] * h
     massO = chemdict['O'][0] * o
     massN = chemdict['N'][0] * n
     massS = chemdict['S'][0] * s
+    massP = chemdict['P'][0] * p
     massNa = chemdict['Na'][0] * na
     massK = chemdict['K'][0] * k
     masse = chemdict['e'][0] * 1
     if mode == "negative":
-        massTotal = massC + massH + massO + massN + massS + masse
+        massTotal = massC + massH + massO + massN + massS +massP + masse
     elif mode == "positive":
-        massTotal = massC + massH + massO + massN + massS + massNa + massK - masse
+        massTotal = massC + massH + massO + massN + massS + +massP + massNa + massK - masse
     return massTotal
 
 #This calculates the natural abundance of a given ion, not yet used much. 
@@ -158,9 +153,9 @@ def getabun(c,h,o,n,s): # Dont need to update this section for Sodium as abundan
     return abunTotal
 
 #this determines which homologous series/general formula the formula provided fits into, returning a number for simplicity   
-def homochecker(o,n,s): 
-	homo = str(o) + str(n) + str(s)
-	homoval = o + n + s
+def homochecker(o,n,s,p): 
+	homo = str(o) + str(n) + str(s) +str(p)
+	homoval = o + n + s +p
 	return homo, homoval
 
 #checks if the formula assignment makes sense for a positive mode ion - based on max elemental limits of CHONSPKNa, where N rule is strictly followed. 
@@ -234,36 +229,38 @@ def neg_nhchecker(h,n):
 	return logicstatement
 
 #Calculates the negative mode ion for given limits	
-def neg_form_calc(maxC, maxH, maxO, maxN, maxS, low, high):
+def neg_form_calc(maxC, maxH, maxO, maxN, maxS,maxP, low, high):
 	maxC = min((int(high) / 12), maxC) #here we say the max carbon count has to be the smaller of the total mass/12 or predefined maxC
 	maxH = min((maxC * 4), maxH) #max hydrogen count is the smaller of 4 times the number of carbons or the predefined max hydrogen number.
 	maxO = min((int(high) / 16), maxO) #here we say the max oxygen count has to be the smaller of the total mass/16 or predefined maxO
 	maxN = maxN + 1
 	maxS = maxS + 1
+	maxP = maxP + 1
 	allpossformula = []
 	allposs = []
 	for c in range(int(maxC))[1:]: #obviously our molecules contain at least 1 C and 1 H
 		for h in range(int(maxH))[1:]: #Based on seven golden rules, a minimum/maximum H/C Ratio - should be 0.125 to 3.1 for 99.7% of molecules, but inc to 4 to represent ESI adduct possibilities
 			hcrat = float(h)/float(c)
 			if 0.2 < hcrat < 3.1:
-				for o in range(int(maxO))[1:]:#we want species containing one oxygen. This is a Whisky/SRFA specific requirement, as in negative ESI we must see it.
-					ocrat = float(o)/float(c)
-					if ocrat < 1.2:
-						for n in range(maxN):
-							ncrat = float(n)/float(c)
-							if ncrat < 1.3:
-								if neg_nhchecker(h,n):
-									for s in range(maxS):
-										scrat = float(s)/float(c)
-										if scrat < 0.8: 
-											mass = getmass(c,h,o,n,s,0,0) 
-											homo,homoval = homochecker(o,n,s)
-											if 0 < float(homoval) < (c*1.3) : #this checker ensures that there are a max 1.3*C heteroatoms. I.e. C10H20O13 is OK, but C10H20O14 is not OK. May need adjustment. 
-												if low < mass < high:
-													formula = "C%iH%iO%iN%iS%iNa%iK%i" % (c,h,o,n,s,0,0) 
-													abundance = getabun(c,h,o,n,s)
-													allposs.append([mass,abundance,c,h,o,n,s,0,0,homo,homoval])
-													allpossformula.append([formula])
+				for p in range(maxP):
+					for o in range(int(maxO))[1:]:#we want species containing one oxygen. This is a Whisky/SRFA specific requirement, as in negative ESI we must see it.
+						ocrat = float(o)/float(c)
+						if ocrat < 1.2:
+							for n in range(maxN):
+								ncrat = float(n)/float(c)
+								if ncrat < 1.3:
+									if neg_nhchecker(h,n):
+										for s in range(maxS):
+											scrat = float(s)/float(c)
+											if scrat < 0.8: 
+												mass = getmass(c,h,o,n,s,p,0,0) 
+												homo,homoval = homochecker(o,n,s,p)
+												if 0 < float(homoval) < (c*1.3) : #this checker ensures that there are a max 1.3*C heteroatoms. I.e. C10H20O13 is OK, but C10H20O14 is not OK. May need adjustment. 
+													if low < mass < high:
+														formula = "C%iH%iO%iN%iS%iP%iNa%iK%i" % (c,h,o,n,s,p,0,0) 
+														abundance = getabun(c,h,o,n,s)
+														allposs.append([mass,abundance,c,h,o,n,s,p,0,0,homo,homoval])
+														allpossformula.append([formula])
 	return allposs    	
 
 
@@ -276,6 +273,7 @@ chemdict = {'H':(1.007825, 0.99984),
             'N':(14.003074, 0.99634),
             'O':(15.994915, 0.99762),
             'Na':(22.989769, 1.0),
+            'P':(30.973763,1.0),
             'S':(31.972071, 0.95041),
             'Cl':(34.968853, 0.75765),
             'K':(38.963706, 0.93258),
@@ -301,15 +299,17 @@ def elementallimits(low,high):
             maxH = 72
             maxO = 18
             maxN = 0
-            maxS = 0#1 #max S found in Whisky was 1
+            maxS = 2#1 #max S found in Whisky was 1
+            maxP = 0
             maxNa = 0
             maxK = 0
-        elif 500 <= high < 1000:
+        elif 500 <= high <= 1000:
             maxC = 66
             maxH = 126
             maxO = 27
             maxN = 0
-            maxS = 0#1 #max S found in Whisky was 1 
+            maxS = 2#1 #max S found in Whisky was 1 
+            maxP = 0
             maxNa = 0
             maxK = 0
             
@@ -320,6 +320,7 @@ def elementallimits(low,high):
             maxO = 18
             maxN = 0#10
             maxS = 0#7
+            maxP = 0
             maxNa = 1
             maxK = 0
         elif 500 <= high < 1000:
@@ -328,27 +329,31 @@ def elementallimits(low,high):
             maxO = 27
             maxN = 0#10
             maxS = 0#4
+            maxP = 0
             maxNa = 1
             maxK = 0
-    return maxC, maxH, maxO, maxN, maxS, maxNa, maxK
-
+    return maxC, maxH, maxO, maxN, maxS,maxP, maxNa, maxK
+    
+import pandas as pd
 #Finally, this bit runs all of the code and saves the output dictionaries as csv files.     
 for i in masses:
     low = i - dictionarywindow
     high = i + dictionarywindow
     print("Calculating formulae between " +str(low) + " and " +str(high) + " m/z")
-    maxC, maxH, maxO, maxN, maxS, maxNa, maxK = elementallimits(low,high)
-    maxlimstring = "C" +str(maxC) + " H"+str(maxH) + " N"+str(maxN) + " O"+str(maxO) +" S"+str(maxS)
+    maxC, maxH, maxO, maxN, maxS,maxP, maxNa, maxK = elementallimits(low,high)
+    maxlimstring = "C" +str(maxC) + " H"+str(maxH) + " N"+str(maxN) + " O"+str(maxO) +" S"+str(maxS)+" P"+str(maxP)
     if mode == "negative":
-        allposs=neg_form_calc(maxC, maxH, maxO, maxN, maxS, low,high)
+        allposs=neg_form_calc(maxC, maxH, maxO, maxN, maxS,maxP, low,high)
     elif mode == "positive":
         allposs=pos_form_calc(maxC, maxH, maxO, maxN, maxS,maxNa,maxK,low,high)
         maxlimstring = maxlimstring + " Na"+str(maxNa) +" K"+str(maxK)
     x = np.array(allposs)
     x = x[np.argsort(x[:,0])]
-    filepathtosave = path+str(mode[:3])
+    filepathtosave = path+"FormulaDictionaries/"+str(mode[:3])
+    df = pd.DataFrame(x,columns=["mass","abundance","C","H","O","N","S","P","Na","K","homo","homoval"])
     FTPM.make_sure_path_exists(filepathtosave) #Makes sure the output directory exists, and creates it if not.
-    np.savetxt(filepathtosave+"\\"+"dict"+str(low)+".csv",x,delimiter=',',fmt="%s")
+    df.to_csv(filepathtosave+"\\"+"dict"+str(low)+".csv",index=False)
+    #np.savetxt(filepathtosave+"\\"+"dict"+str(low)+".csv",x,delimiter=',',fmt="%s")
     if i == masses[-1]:
         print("Max Elemental Limits were:")
         print(maxlimstring)
