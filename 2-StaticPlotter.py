@@ -54,22 +54,17 @@ except NameError: #if not running in ipython....
     import FTMSVizProcessingModule as FTPM
     path  = os.getcwd()+"data\\" #example data location
 else: #if running in ipython
-    #homepath
-    #scriptlocation = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts"
-    #OfficeDesktopPath
     scriptlocation = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\FTMS\\DataProcessingScripts"
     sys.path.append(scriptlocation)
     import FTMSVizProcessingModule as FTPM
-    #OfficeDesktopPath
     path = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\data\\"
-    #HomeDesktopPath
-   # path = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\data\\"
-
 
     
 """
 Here we define the location of the input CSV(s) in the right format for us to use. 
+
 These will with the headers = [,"Exp. m/z","Recal m/z","Theor. Mass","Error","Rel. Abundance","DBE","Cno","Hno","Nno","Ono","Sno","Formula","HeteroClass"]
+
 Empty first column for the pandas index.
 n rows for assigned formulae
 Here we define the input folder location. This directory should contain CSV files output by petroorg. It should not matter if there are other files or directories present, as long as they dont end in .csv
@@ -101,7 +96,7 @@ if titlelogic.upper() == "Y":
     titlelogic = True #Do you want titles? True or False
 else:
     titlelogic = False
-    
+	
 hexbinlogic = input("Do you want hexbin outputs - Y or N? ")
 if hexbinlogic.upper() == "Y":
     hexbinlogic = True
@@ -127,7 +122,7 @@ def fileplotter():
         #this next bit passes the appropriate values to the plotting functions.
         produceplots(y[:-9],data["RA"], data["DBE"], data["AI"],
                      data["OC"], data["HC"], data["NC"], data["SC"], 
-                     data["mz"],data["Error"], data["Cno"], data["Ono"])
+                     data["mz"],data["Error"], data["C"], data["O"])
         print("Processed file " + str(filenumber) +" of "+ filenumbertotal +".")
         filenumber = filenumber+1
 
