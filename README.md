@@ -30,6 +30,11 @@
 
 Kew, W., Blackburn, J. W. T., Clarke, D. J., and Uhrín, D. (2017) Interactive van Krevelen Diagrams – Advanced Visualization of Mass Spectrometry Data of Complex Mixtures. Rapid Commun. Mass Spectrom., 31: 658-662 doi: [10.1002/rcm.7823](http://dx.doi.org/10.1002/rcm.7823)
 
+# Updates
+September 2020: Fixed files 0,1,2,3,4 to run OK with Python 3.7 and modern versions of packages.
+Odd behaviour on the interactive figures  - to fix
+
+
 # Version 1.0
 [![DOI](https://zenodo.org/badge/70805234.svg)](https://zenodo.org/badge/latestdoi/70805234)
 
