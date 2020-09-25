@@ -62,6 +62,8 @@ Formula constraints tightened for what is known in Scotch Whisky (Negative ESI o
 May need adjusting for other ionisation sources and modes. 
 Negative mode formula must now have an odd number of protons - this means they have been ionised by loss of a proton. Radicals, etc, will not be determined. 
 #####
+Version 6 - September 2020
+Add support for P for Positive mode - fix broken code.
 """
 
 import numpy as np
@@ -78,10 +80,10 @@ except NameError: #if not running in ipython....
     import FTMSVizProcessingModule as FTPM
     path  = os.getcwd()+"\\data\\" #example data location
 else: #if running in ipython
-    scriptlocation = "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/Scripts/"
+    scriptlocation = "/LOCAL/FTMSVis/FTMSVisualization-master/"
     sys.path.append(scriptlocation)
     import FTMSVizProcessingModule as FTPM
-    path = "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/"
+    path = "/LOCAL/FTMSVis/"
     
 from datetime import datetime
 
@@ -182,41 +184,43 @@ def pos_adduct_checker(h,n,na,k):
 	return logicstatement
 
 #Calculates formulae in positive mode for given limits. Includes possibility of Sodium and Potassium adducts. 
-def pos_form_calc(maxC, maxH, maxO, maxN, maxS, maxNa, maxK, low, high):
-	maxC = min((int(high) / 12), maxC) #here we say the max carbon count has to be the smaller of the total mass/12 or predefined maxC
-	maxH = min((maxC * 4), maxH) #max hydrogen count is the smaller of 4 times the number of carbons or the predefined max hydrogen number.
-	maxO = min((int(high) / 16), maxO) #here we say the max oxygen count has to be the smaller of the total mass/16 or predefined maxO
-	maxN = maxN + 1
-	maxS = maxS + 1
-	maxNa = maxNa + 1
-	maxK = maxK + 1
-	allpossformula = []
-	allposs = []
-	for c in range(int(maxC))[1:]: #obviously our molecules contain at least 1 C and 1 H
-		for h in range(int(maxH))[1:]: #Based on seven golden rules, a minimum/maximum H/C Ratio - should be 0.125 to 3.1 for 99.7% of molecules, but inc to 4 to represent ESI adduct possibilities
-			hcrat = float(h)/float(c)
-			if 0.2 < hcrat < 3.1:
-				for o in range(int(maxO)):
-					ocrat = float(o)/float(c)
-					if ocrat < 1.2:
-						for n in range(maxN):
-							ncrat = float(n)/float(c)
-							if ncrat < 1.3:
-								for s in range(maxS):
-									scrat = float(s)/float(c)
-									if scrat < 0.8:
-										for na in range(maxNa):
-											for k in range(maxK):
-												if pos_adduct_checker(h,n,na,k):
-													mass = getmass(c,h,o,n,s,na,k) 
-													homo,homoval = homochecker(o,n,s)
-													if 0 < float(homoval) < (c*1.3) : #this checker ensures that there are a max 1.3*C heteroatoms. I.e. C10H20O13 is OK, but C10H20O14 is not OK. May need adjustment. 
-														if low < mass < high:
-															formula = "C%iH%iO%iN%iS%iNa%iK%i" % (c,h,o,n,s,na,k) 
-															abundance = getabun(c,h,o,n,s)
-															allposs.append([mass,abundance,c,h,o,n,s,na,k,homo,homoval])
-															allpossformula.append([formula])
-	return allposs   
+def pos_form_calc(maxC, maxH, maxO, maxN, maxS,maxP, maxNa, maxK, low, high):
+    maxC = min((int(high) / 12), maxC) #here we say the max carbon count has to be the smaller of the total mass/12 or predefined maxC
+    maxH = min((maxC * 4), maxH) #max hydrogen count is the smaller of 4 times the number of carbons or the predefined max hydrogen number.
+    maxO = min((int(high) / 16), maxO) #here we say the max oxygen count has to be the smaller of the total mass/16 or predefined maxO
+    maxN = maxN + 1
+    maxS = maxS + 1
+    maxP = maxP + 1
+    maxNa = maxNa + 1
+    maxK = maxK + 1
+    allpossformula = []
+    allposs = []
+    for c in range(int(maxC))[1:]: #obviously our molecules contain at least 1 C and 1 H
+        for h in range(int(maxH))[1:]: #Based on seven golden rules, a minimum/maximum H/C Ratio - should be 0.125 to 3.1 for 99.7% of molecules, but inc to 4 to represent ESI adduct possibilities
+            hcrat = float(h)/float(c)
+            if 0.2 < hcrat < 3.1:
+                for p in range(int(maxP)):
+                    for o in range(int(maxO)):
+                        ocrat = float(o)/float(c)
+                        if ocrat < 1.2:
+                            for n in range(maxN):
+                                ncrat = float(n)/float(c)
+                                if ncrat < 1.3:
+                                    for s in range(maxS):
+                                        scrat = float(s)/float(c)
+                                        if scrat < 0.8:
+                                            for na in range(maxNa):
+                                                for k in range(maxK):
+                                                    if pos_adduct_checker(h,n,na,k):
+                                                        mass = getmass(c,h,o,n,s,p,na,k) 
+                                                        homo,homoval = homochecker(o,n,s,p)
+                                                        if 0 < float(homoval) < (c*1.3) : #this checker ensures that there are a max 1.3*C heteroatoms. I.e. C10H20O13 is OK, but C10H20O14 is not OK. May need adjustment. 
+                                                            if low < mass < high:
+                                                                formula = "C%iH%iO%iN%iS%iP%iNa%iK%i" % (c,h,o,n,s,p,na,k) 
+                                                                abundance = getabun(c,h,o,n,s)
+                                                                allposs.append([mass,abundance,c,h,o,n,s,p,na,k,homo,homoval])
+                                                                allpossformula.append([formula])
+    return allposs   
 
 #Checks N rule (and #H) to see if assigned formula is logical for a negative mode ion. 
 def neg_nhchecker(h,n):
@@ -345,7 +349,7 @@ for i in masses:
     if mode == "negative":
         allposs=neg_form_calc(maxC, maxH, maxO, maxN, maxS,maxP, low,high)
     elif mode == "positive":
-        allposs=pos_form_calc(maxC, maxH, maxO, maxN, maxS,maxNa,maxK,low,high)
+        allposs=pos_form_calc(maxC, maxH, maxO, maxN, maxS,maxP, maxNa,maxK,low,high)
         maxlimstring = maxlimstring + " Na"+str(maxNa) +" K"+str(maxK)
     x = np.array(allposs)
     x = x[np.argsort(x[:,0])]

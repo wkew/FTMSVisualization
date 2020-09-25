@@ -54,10 +54,10 @@ except NameError: #if not running in ipython....
     import FTMSVizProcessingModule as FTPM
     path  = os.getcwd()+"data\\" #example data location
 else: #if running in ipython
-    scriptlocation = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\FTMS\\DataProcessingScripts"
+    scriptlocation = "/LOCAL/FTMSVis/FTMSVisualization-master/"
     sys.path.append(scriptlocation)
     import FTMSVizProcessingModule as FTPM
-    path = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\data\\"
+    path = "/LOCAL/FTMSVis/data/"
 
     
 """
@@ -168,11 +168,15 @@ def Plotter(X,Y,title,size,Cvar,CvarLab,Xlabel,Ylabel,xlim,ylim,clim,location,pl
     axes.set_ylim(ylim) #this sets the y limit
     plt.locator_params(axis='y',nbins=4) #this defines the number of ticks on y axis
     plt.locator_params(axis='x',nbins=5) #this defines the number of ticks on x axis
+    axes.get_yaxis().set_tick_params(which='both', direction='out',
+                                    left="on",bottom="on",top="off",right="off",
+                                    width=1.25,length=8) #this sets tick size and direction y axis
+    axes.get_xaxis().set_tick_params(which='both', direction='out',
+                                    left="on",bottom="on",top="off",right="off",
+                                    width=1.25,length=8) #this sets tick size and direction x axis
     plt.tick_params(axis="both",which="major",left="on",bottom="on",top="off",right="off",labelsize=labelsize) #this sets the major ticks and sizes.
     plt.tick_params(axis="both",which="minor",left="on",bottom="on",top="off",right="off") #this sets the minor ticks and sizes 
-    axes.get_yaxis().set_tick_params(which='both', direction='out',width=1.25,length=8) #this sets tick size and direction y axis
-    axes.get_xaxis().set_tick_params(which='both', direction='out',width=1.25,length=8) #this sets tick size and direction x axis
-    
+
     for tick in axes.xaxis.get_major_ticks():
         #tick.label1.set_fontsize(fontsize) #this would set a size, but it is unused.
         tick.label1.set_fontweight('bold') #this makes the tick labels bold on x axis
@@ -185,7 +189,7 @@ def Plotter(X,Y,title,size,Cvar,CvarLab,Xlabel,Ylabel,xlim,ylim,clim,location,pl
         cb.set_label(CvarLab,size=labelsize) 
         cb.ax.tick_params(labelsize=labelsize) 
         cb.set_alpha(1)
-        cb.set_clim(clim)
+        plt.clim(clim)
         cb.draw_all()
     elif plottype =="hexbin": #sets a couple more variables for scatter plot colourbar - currently identical to scatter, but kept separate in case of need to change.
         cb = plt.colorbar(ax1)
@@ -196,7 +200,7 @@ def Plotter(X,Y,title,size,Cvar,CvarLab,Xlabel,Ylabel,xlim,ylim,clim,location,pl
     plt.tight_layout() #this makes sure the entire figure fits within the predefined image size.
     FTPM.make_sure_path_exists(path+imagefolder+location+"/") #Makes sure the output directory exists, and creates it if not.
     plt.savefig(path+imagefolder+location+"/"+title+".png",dpi=600) #saves the PNG (raster) at high DPI
-    plt.savefig(path+imagefolder+location+"/"+title+".eps",dpi=600) #saves an EPS (vector) at high DPI.
+    #plt.savefig(path+imagefolder+location+"/"+title+".eps",dpi=600) #saves an EPS (vector) at high DPI.
     plt.show() #shows the image (useful if running in an IPython console.)
     
   

@@ -82,15 +82,15 @@ try: #test if running in ipython
 except NameError: #if not running in ipython....
     import FTMSVizProcessingModule as FTPM
     path  = os.getcwd()+"\\data\\" #example data location
-    dictionarypath = path+"\\FormulaDictionaries\\"
+    dictionarypath = os.getcwd()+"\\FormulaDictionaries\\"
 else: #if running in ipython
     #OfficeDesktopPath
-    scriptlocation = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/Scripts/"
+    scriptlocation = "/LOCAL/FTMSVis/FTMSVisualization-master/"
     sys.path.append(scriptlocation)
     import FTMSVizProcessingModule as FTPM
     #OfficeDesktopPath
-    path = "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/data/"
-    dictionarypath= "F:/Will/Dropbox/Documents/University/Edinburgh/Coding/Python3/FTMS/FTMSVisToolkit/FormulaDictionaries/"
+    path = "/LOCAL/FTMSVis/data/"
+    dictionarypath= "/LOCAL/FTMSVis/FormulaDictionaries/"
 
 
 

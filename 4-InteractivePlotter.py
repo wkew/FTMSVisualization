@@ -41,6 +41,7 @@ import os, sys
 from bokeh.embed import file_html
 from bokeh.util.browser import view
 from bokeh.plotting import figure
+from bokeh.events import ButtonClick
 from bokeh.models import HoverTool, ColumnDataSource, OpenURL, TapTool, layouts, CustomJS, PrintfTickFormatter, ColorBar, LinearColorMapper, FixedTicker
 from bokeh.models.widgets import Panel, Tabs, Button, DataTable, TableColumn, NumberFormatter#, Dropdown
 #from bokeh.palettes import Viridis10, Inferno8
@@ -62,16 +63,10 @@ except NameError: #if not running in ipython....
     import FTMSVizProcessingModule as FTPM
     path  = os.getcwd()+"data\\" #example data location
 else: #if running in ipython
-    #homepath
-    #scriptlocation = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts"
-    #OfficeDesktopPath
-    scriptlocation = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\FTMS\\DataProcessingScripts"
+    scriptlocation = "/LOCAL/FTMSVis/FTMSVisualization-master/"
     sys.path.append(scriptlocation)
     import FTMSVizProcessingModule as FTPM
-    #OfficeDesktopPath
-    path = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\data\\"
-    #HomeDesktopPath
-    #path = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\data\\"
+    path = "/LOCAL/FTMSVis/data/"
 
 #define the colourmap of choice
 glocmap = list(bp.Viridis10)
@@ -102,20 +97,23 @@ def intfileplot():
 def intplotter(data,isodata,nodata,y,hetclassintdf):
     linewidth = 1.5
     source = ColumnDataSource(data)
-    s2 = ColumnDataSource(data=dict(mz=data["mz"],Error=data["Error"],RA=data["RA"],Formula=data["Formula"],HeteroClass=data["HeteroClass"]))    
+    s2 = ColumnDataSource(data=dict(mz=data["mz"],Error=data["Error"],RA=data["RA"],
+                                    Formula=data["Formula"],HeteroClass=data["HeteroClass"]))    
     isosource = ColumnDataSource(isodata)
     nosource = ColumnDataSource(nodata)
     url = "http://www.chemspider.com/Search.aspx?q=@Formula"
-    TOOLS="crosshair,pan,wheel_zoom,box_zoom,reset,tap,previewsave,box_select,poly_select,lasso_select,hover"
+    TOOLS="crosshair,pan,wheel_zoom,box_zoom,reset,tap,save,box_select,poly_select,lasso_select,hover"
     
     figdims = (900,500) #pixel dimensions for the normal figures
     msxlim = [200,700] #x limits in m/z for the mass spectra
     
     vkxlim = [0,1]
     vkylim = [0,2]
-    p1 = figure(tools=TOOLS, title=y[:-9]+" - Van Krevelen",width=figdims[0], height=figdims[1], x_axis_label='O/C',y_axis_label='H/C',webgl=True,x_range=vkxlim,y_range=vkylim)
+    p1 = figure(tools=TOOLS, title=y[:-9]+" - Van Krevelen",width=figdims[0], height=figdims[1],
+                x_axis_label='O/C',y_axis_label='H/C',x_range=vkxlim,y_range=vkylim)
     color_mapper = LinearColorMapper(palette=glocmap, low=msxlim[0], high=msxlim[1])
-    p1.scatter(x='OC', y='HC',source=source,size='VKsize', fill_color={'field': 'mz', 'transform': color_mapper}, fill_alpha=0.75,line_color=None) #use size not radius.
+    p1.scatter(x='OC', y='HC',source=source,size='VKsize', fill_color={'field': 'mz', 'transform': color_mapper},
+               fill_alpha=0.75,line_color=None) #use size not radius.
     hover = p1.select(dict(type=HoverTool))
     hover.tooltips = OrderedDict([('Formula', "@Formula"),('Mass',"@mz{1.11111}"),('Error (ppm)',"@Error{1.11}")])
     taptool = p1.select(type=TapTool)
@@ -128,25 +126,30 @@ def intplotter(data,isodata,nodata,y,hetclassintdf):
 
     dbexlim = [0,45]
     dbeylim = [0,40]
-    cmax = max(data["Ono"])
+    cmax = max(data["O"])
     cmax = int(5 * round(float(cmax)/5))
-    p2 = figure(tools=TOOLS, title=y[:-9]+" - DBE vs C# Plot",width=figdims[0], height=figdims[1], x_axis_label='C#',y_axis_label='DBE',webgl=True,x_range=dbexlim,y_range=dbeylim)
+    p2 = figure(tools=TOOLS, title=y[:-9]+" - DBE vs C# Plot",width=figdims[0],
+                height=figdims[1], x_axis_label='C#',y_axis_label='DBE',x_range=dbexlim,y_range=dbeylim)
     color_mapper2 = LinearColorMapper(palette=glocmap2, low=0, high=cmax)
-    p2.scatter(x='Cno', y='DBE',source=source,size='VKsize', fill_color={'field': 'Ono', 'transform': color_mapper2}, fill_alpha=0.75,line_color=None)
+    p2.scatter(x='C', y='DBE',source=source,size='VKsize', fill_color={'field': 'O', 'transform': color_mapper2},
+               fill_alpha=0.75,line_color=None)
     hover = p2.select(dict(type=HoverTool))
     hover.tooltips = OrderedDict([('Formula', "@Formula"),('Mass',"@mz{1.11111}"),('Error (ppm)',"@Error{1.11}")])
     taptool = p2.select(type=TapTool)
     taptool.callback = OpenURL(url=url)
     
-    color_bar2 = ColorBar(color_mapper=color_mapper2, title="O#", border_line_color=None, location=(0,0), scale_alpha=0.7,ticker=FixedTicker(ticks=[0,int(cmax/4),int(cmax/2),int(3*cmax/4),cmax]))
+    color_bar2 = ColorBar(color_mapper=color_mapper2, title="O#", border_line_color=None, location=(0,0),
+                          scale_alpha=0.7,ticker=FixedTicker(ticks=[0,int(cmax/4),int(cmax/2),int(3*cmax/4),cmax]))
     p2.add_layout(color_bar2,"right")
     
     aixlim=[0,45]
     aiylim= [0,1]
 
-    p3 = figure(tools=TOOLS, title=y[:-9]+" - AI(mod) vs C# Plot",width=figdims[0], height=figdims[1], x_axis_label='C#',y_axis_label='AI(mod)',webgl=True,x_range=aixlim,y_range=aiylim)
+    p3 = figure(tools=TOOLS, title=y[:-9]+" - AI(mod) vs C# Plot",width=figdims[0],
+                height=figdims[1], x_axis_label='C#',y_axis_label='AI(mod)',x_range=aixlim,y_range=aiylim)
     color_mapper3 = LinearColorMapper(palette=glocmap2, low=0, high=cmax)    
-    p3.scatter(x='Cno', y='AImod',source=source,size='VKsize', fill_color={'field': 'Ono', 'transform': color_mapper3}, fill_alpha=0.75,line_color=None)
+    p3.scatter(x='C', y='AImod',source=source,size='VKsize', fill_color={'field': 'O', 'transform': color_mapper3},
+               fill_alpha=0.75,line_color=None)
     hover = p3.select(dict(type=HoverTool))
     hover.tooltips = OrderedDict([('Formula', "@Formula"),('Mass',"@mz{1.11111}"),('Error (ppm)',"@Error{1.11}")])
     taptool = p3.select(type=TapTool)
@@ -156,7 +159,9 @@ def intplotter(data,isodata,nodata,y,hetclassintdf):
     p3.add_layout(color_bar3,"right")
 
     
-    p4 = figure(tools=TOOLS, title=y[:-9]+" - Assigned Centroid MS",width=figdims[0], height=figdims[1], x_axis_label='m/z',y_axis_label='Abundance',y_range=[min(data["RA"]),max(data["RA"])],x_range=msxlim)
+    p4 = figure(tools=TOOLS, title=y[:-9]+" - Assigned Centroid MS",width=figdims[0],
+                height=figdims[1], x_axis_label='m/z',y_axis_label='Abundance',y_range=[min(data["RA"]),max(data["RA"])],
+                x_range=msxlim)
     p4.segment(x0=0,x1=800,y0=0,y1=0,line_width=1, line_color="black")
     p4.segment(x0='mz',y0=0,x1='mz',y1='RA',source=source,line_width=linewidth, line_color="black")
     p4.scatter(x='mz', y='RA',source=source,fill_color='black',line_color=None)
@@ -176,14 +181,16 @@ def intplotter(data,isodata,nodata,y,hetclassintdf):
     tab7 = Panel(child=t7,title="test")
     """
     stretch = msxlim[0]*0.1
-    p5 = figure(tools=TOOLS, title=y[:-9]+" - Assigned Centroid MS",width=1400, height=600, x_axis_label='m/z',y_axis_label='Abundance', y_range=[min(data["RA"]),max(data["RA"])],x_range=(msxlim[0]-stretch,msxlim[1]+stretch))
+    p5 = figure(tools=TOOLS, title=y[:-9]+" - Assigned Centroid MS",width=1400, height=600,
+                x_axis_label='m/z',y_axis_label='Abundance', y_range=[min(data["RA"]),max(data["RA"])],
+                x_range=(msxlim[0]-stretch,msxlim[1]+stretch))
     p5.segment(x0=0,x1=800,y0=0,y1=0,line_width=1, line_color="black")
-    no1 =p5.segment(x0='mz',y0=0,x1='mz',y1='RA',source=nosource,line_width=linewidth, line_color="red")
-    no2 =p5.scatter(x='mz', y='RA',source=nosource,fill_color='red',line_color=None,legend="Unassigned Peaks")
-    p5.scatter(x='mz', y='RA',source=source,fill_color='black',line_color=None,legend="Assigned Peaks")
-    p5.segment(x0='mz',y0=0,x1='mz',y1='RA',source=source,line_width=linewidth, line_color="black")
-    iso1 =p5.segment(x0='mz',y0=0,x1='mz',y1='RA',source=isosource,line_width=linewidth, line_color="green")
-    iso2 =p5.scatter(x='mz', y='RA',source=isosource,fill_color='green',line_color=None, legend="Isotologue Peaks")
+    no1 =p5.segment(x0='mz',y0=0,x1='mz',y1='RA',source=nosource,line_width=linewidth, line_color="red",legend_label="Unassigned Peaks")
+    #no2 =p5.scatter(x='mz', y='RA',source=nosource,fill_color='red',line_color=None,legend_label="Unassigned Peaks")
+    #p5.scatter(x='mz', y='RA',source=source,fill_color='black',line_color=None,legend_label="Assigned Peaks")
+    p5.segment(x0='mz',y0=0,x1='mz',y1='RA',source=source,line_width=linewidth, line_color="black",legend_label="Assigned Peaks")
+    iso1 =p5.segment(x0='mz',y0=0,x1='mz',y1='RA',source=isosource,line_width=linewidth, line_color="green",legend_label="Isotologue Peaks")
+    #iso2 =p5.scatter(x='mz', y='RA',source=isosource,fill_color='green',line_color=None, legend_label="Isotologue Peaks")
 
     hover = p5.select(dict(type=HoverTool))
     hover.tooltips = OrderedDict([('Formula', "@Formula"),('Mass',"@mz{1.11111}"),('Error (ppm)',"@Error{1.11}")])
@@ -191,22 +198,26 @@ def intplotter(data,isodata,nodata,y,hetclassintdf):
     taptool.callback = OpenURL(url=url) 
     p5.yaxis[0].formatter = PrintfTickFormatter(format="%4.1e")
 
-
-    js_code1 = "iso1.glyph.visible = false; iso2.glyph.visible = false; no1.glyph.visible = false; no2.glyph.visible = false;"
-    cb1 = CustomJS(code=js_code1, args=dict(iso1=iso1,iso2=iso2,no1=no1,no2=no2))
-    js_code2 = "iso1.glyph.visible = true; iso2.glyph.visible = true; no1.glyph.visible = true; no2.glyph.visible = true;"
-    cb2 = CustomJS(code=js_code2, args=dict(iso1=iso1,iso2=iso2,no1=no1,no2=no2))
+    #Bokeh 2 doesnt need JS buttons thanks to interactive legends
+    #js_code1 = "iso1.glyph.visible = false; iso2.glyph.visible = false; no1.glyph.visible = false; no2.glyph.visible = false;"
+    #cb1 = CustomJS(code=js_code1, args=dict(iso1=iso1,iso2=iso2,no1=no1,no2=no2))
+    #js_code2 = "iso1.glyph.visible = true; iso2.glyph.visible = true; no1.glyph.visible = true; no2.glyph.visible = true;"
+    #cb2 = CustomJS(code=js_code2, args=dict(iso1=iso1,iso2=iso2,no1=no1,no2=no2))
         
-    toggleOn = Button(label="Hide", button_type="success",callback=cb1)
-    toggleOff = Button(label="Show", button_type="success",callback=cb2)    
-    
-    top = layouts.Row(toggleOn,toggleOff)    
-    t3 = layouts.Column(top,p5)
+    #toggleOn = Button(label="Hide", button_type="success")
+    #toggleOn.js_on_click(cb1)
+    #toggleOff = Button(label="Show", button_type="success")    
+    #toggleOn.js_on_click(cb2)
+
+    #top = layouts.Row(toggleOn,toggleOff)    
+    t3 = layouts.Column(p5)
+    p5.legend.location = "top_left"
+    p5.legend.click_policy="hide"
     tab3 = Panel(child=t3,title="Centroid MS with Isotopomers and No Hits")
     
  
     downloadbutton = Button(label="Download", button_type="success")
-    downloadbutton.callback = CustomJS(args=dict(s2=s2), code="""
+    cb3 = CustomJS(args=dict(s2=s2), code="""
 		var data = s2.get('data');
 		var filetext = 'mz,Error,RA,Formula,HeteroClass\\n';
 		for (i=0; i < data['mz'].length; i++) {
@@ -235,7 +246,8 @@ def intplotter(data,isodata,nodata,y,hetclassintdf):
 			link.style.visibility = 'hidden';
 			link.dispatchEvent(new MouseEvent('click'))
 		}
-	""")       
+	""")     
+    downloadbutton.js_on_event(ButtonClick,cb3)
  
 
     columns = [TableColumn(field="mz",title="m/z",formatter=NumberFormatter(format="0.00000")),
@@ -243,11 +255,11 @@ def intplotter(data,isodata,nodata,y,hetclassintdf):
                 TableColumn(field="RA",title="Abundance"),
                 TableColumn(field="Formula",title="Formula"),
                 TableColumn(field="HeteroClass",title="Heteroatomic Class")]    
-    data_table = DataTable(source=s2, columns=columns, width=1400,row_headers=False,fit_columns=True)
+    data_table = DataTable(source=s2, columns=columns, width=1400,header_row=False,fit_columns=True)
     t4 = layouts.Column(data_table,downloadbutton)
     tab4=Panel(child=t4,title="Selected Data Table")
-    
-    source.callback = CustomJS(args=dict(s2=s2,dt=data_table), code="""
+
+    cb4 = CustomJS(args=dict(s2=s2,dt=data_table), code="""
         var inds = cb_obj.get('selected')['1d'].indices;
         var d1 = cb_obj.get('data');
         var d2 = s2.get('data');
@@ -275,6 +287,8 @@ def intplotter(data,isodata,nodata,y,hetclassintdf):
         s2.trigger('change');
         dt.trigger('change');
     """)
+    source.selected.js_on_change('indices', cb4)
+
     
     """
     hetclasslist = hetclassintdf["HetClass"].tolist()

@@ -52,16 +52,10 @@ except NameError: #if not running in ipython....
     import FTMSVizProcessingModule as FTPM
     path  = os.getcwd()+"data\\" #example data location
 else: #if running in ipython
-    #homepath
-    #scriptlocation = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts"
-    #OfficeDesktopPath
-    scriptlocation = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\FTMS\\DataProcessingScripts"
+    scriptlocation = "/LOCAL/FTMSVis/FTMSVisualization-master/"
     sys.path.append(scriptlocation)
     import FTMSVizProcessingModule as FTPM
-    #OfficeDesktopPath
-    path = "F:\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\data\\"
-    #HomeDesktopPath
-    #path = "C:\\Users\\Will\\Dropbox\\Documents\\University\\Edinburgh\\Coding\\Python3\\FTMS\\DataProcessingScripts\\data\\"
+    path = "/LOCAL/FTMSVis/data/"
     
     
 whisky = input("Are these Whisky samples - Y or N?" )
